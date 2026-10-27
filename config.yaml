@@ -1,0 +1,99 @@
+# =====================================================================
+#  paper-digest configuration — edit this file to make the digest yours
+#  The example below is set up for drone / aerial robotics research.
+# =====================================================================
+
+# --- General -----------------------------------------------------------
+subject_prefix: Paper digest          # email subject starts with this
+contact_email: you@example.com        # your email; sent to Crossref/OpenAlex (polite pool). Not where the digest goes.
+
+# How far back each run looks. Match it to the schedule in .github/workflows/digest.yml:
+#   daily run -> 1   |   weekly run -> 7   |   monthly run -> 31
+days_back: 7
+
+# --- Relevance gate ----------------------------------------------------
+# A paper must mention at least ONE of these (title or abstract) to be considered.
+# Leave the list empty ([]) to accept every paper in the categories/venues below.
+required_terms: [quadrotor, quadcopter, multirotor, UAV, MAV, drone, aerial robot, aerial vehicle]
+
+# --- Topics ------------------------------------------------------------
+# Each section becomes a heading in the email. Keywords score the paper:
+#   score = sum(weight x hits);  hits in the TITLE count title_multiplier times.
+# A paper is listed under the section where it scores highest.
+# Matching is case-insensitive, except ALL-CAPS acronyms (e.g. MPC, SLAM), which match exactly.
+sections:
+  - name: Control & planning
+    keywords:
+      model predictive control: 4
+      MPC: 3
+      trajectory optimization: 3
+      trajectory planning: 3
+      motion planning: 3
+      minimum snap: 3
+      obstacle avoidance: 3
+      reinforcement learning: 2
+
+  - name: Agile flight & racing
+    keywords:
+      drone racing: 5
+      agile: 3
+      acrobatic: 4
+      time-optimal: 4
+      high-speed: 2
+
+  - name: Perception & state estimation
+    keywords:
+      visual-inertial: 4
+      SLAM: 3
+      LiDAR: 3
+      state estimation: 3
+      vision-language: 4
+      target tracking: 3
+
+  - name: Multi-robot & simulation
+    keywords:
+      swarm: 4
+      multi-robot: 3
+      digital twin: 4
+      sim-to-real: 4
+      PX4: 3
+      Gazebo: 2
+
+title_multiplier: 2.0
+peer_review_bonus: 1      # extra points for journal/conference papers vs arXiv preprints
+min_score: 6              # raise if the email is too long, lower if it's too short
+max_papers: 25            # cap per email
+
+# --- Sources -----------------------------------------------------------
+use_arxiv: true
+arxiv_categories: [cs.RO, cs.SY, eess.SY, cs.CV, cs.LG, cs.AI]
+# Full list: https://arxiv.org/category_taxonomy
+
+# Journals, matched by ISSN (look it up on the journal's homepage or https://portal.issn.org).
+# Delete this whole block (or set `journals: {}`) to skip journals.
+journals:
+  T-RO: [1552-3098, 1941-0468]
+  RA-L: [2377-3766]
+  RAS: [0921-8890]
+  IJRR: [0278-3649, 1741-3176]
+  Science Robotics: [2470-9476]
+  JFR: [1556-4959, 1556-4967]
+  Autonomous Robots: [0929-5593, 1573-7527]
+  Drones (MDPI): [2504-446X]
+
+# Conferences, matched by (part of) the proceedings title as registered in Crossref.
+# IEEE uploads proceedings in batches after each event. Venues without DOIs (RSS, CoRL) come via arXiv.
+conferences:
+  ICRA: International Conference on Robotics and Automation
+  IROS: International Conference on Intelligent Robots and Systems
+  ICUAS: International Conference on Unmanned Aircraft Systems
+
+# --- Optional AI re-ranking ---------------------------------------------
+# Only used if the ANTHROPIC_API_KEY secret is set. Claude rates each shortlisted
+# paper 0-10 against the profile below and adds a one-line "why".
+llm:
+  model: claude-haiku-5-5
+  min_relevance: 6
+  profile: >
+    Describe your research in 2-4 sentences here: topics, methods, platforms,
+    and what you want to see (and not see) in the digest.
