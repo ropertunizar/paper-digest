@@ -1,0 +1,27 @@
+name: paper-digest
+on:
+  schedule:
+    # When to run (UTC). Keep days_back in config.yaml consistent with this.
+    #   weekly, Monday 06:00 UTC  ->  "0 6 * * 1"    (days_back: 7)
+    #   daily, 06:00 UTC          ->  "0 6 * * *"    (days_back: 1)
+    #   weekdays, 06:00 UTC       ->  "0 6 * * 1-5"  (days_back: 1; Monday misses the weekend, use 3 to include it)
+    #   monthly, 1st at 06:00 UTC ->  "0 6 1 * *"    (days_back: 31)
+    # Builder: https://crontab.guru
+    - cron: "0 6 * * 1"
+  workflow_dispatch: {}   # adds the manual "Run workflow" button
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements.txt
+      - run: python digest.py
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
